@@ -8,7 +8,7 @@ import secrets
 from machine import Pin
 from prometheus_remote_write_payload import PrometheusRemoteWritePayload
 
-DEBOUNCE_MS = 3000
+DEBOUNCE_MS = 2000
 
 REQUEST_HEADERS = {
     "Content-Encoding": "snappy",
@@ -19,18 +19,22 @@ REQUEST_HEADERS = {
 
 PROMETHEUS_AUTH = (secrets.PROMETHEUS_USER, secrets.PROMETHEUS_PASSWORD)
 
-button = Pin(14, Pin.IN, Pin.PULL_UP)
-last_press = 0
+count_button = Pin(14, Pin.IN, Pin.PULL_UP)
+reset_button = Pin(9, Pin.IN, Pin.PULL_UP)
+
+last_count_press = 0
+last_reset_press = 0
 num_presses = 0
 
-def button_pressed(pin):
-    global last_press, num_presses
+def count_button_pressed(pin):
+    global last_count_press, num_presses
 
     ms_now = time.ticks_ms()
 
-    if time.ticks_diff(ms_now, last_press) >= DEBOUNCE_MS:
+    if time.ticks_diff(ms_now, last_count_press) >= DEBOUNCE_MS:
+        is_sending = True
         print("Pressed!")
-        last_press = ms_now
+        last_count_press = ms_now
         num_presses += 1
 
         prometheus = PrometheusRemoteWritePayload()
@@ -60,8 +64,16 @@ def button_pressed(pin):
 
         gc.collect() # Clean up memory... :(
 
+def reset_button_pressed(pin):
+    global last_reset_press, num_presses
 
-button.irq(trigger=Pin.IRQ_FALLING, handler=button_pressed)
+    ms_now = time.ticks_ms()
+
+    if time.ticks_diff(ms_now, last_reset_press) >= DEBOUNCE_MS:
+        num_presses = 0
+        print("Count reset to 0.")
+        last_reset_press = ms_now
+
 
 # Connect to the network.
 wlan = network.WLAN(network.STA_IF)
@@ -77,6 +89,8 @@ ntptime.settime()
 
 print(f"Connected, IP address: {ip_address}, time: {time.time()}")
 
+count_button.irq(trigger=Pin.IRQ_FALLING, handler=count_button_pressed)
+reset_button.irq(trigger=Pin.IRQ_FALLING, handler=reset_button_pressed)
 
 while True:
     time.sleep(0.25)
