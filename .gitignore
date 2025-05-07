@@ -1,0 +1,6 @@
+.DS_Store
+*.bak
+*.swp
+*.tmp
+secrets.py
+.vscode/
