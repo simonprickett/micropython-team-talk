@@ -2,5 +2,6 @@
 *.bak
 *.swp
 *.tmp
+*.code-workspace
 secrets.py
 .vscode/
