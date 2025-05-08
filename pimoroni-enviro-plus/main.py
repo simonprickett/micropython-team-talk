@@ -5,14 +5,16 @@ import time
 
 from breakout_bme68x import BreakoutBME68X, STATUS_HEATER_STABLE
 from machine import Pin, ADC
+from picographics import PicoGraphics, DISPLAY_ENVIRO_PLUS
 from pimoroni_i2c import PimoroniI2C
 from breakout_ltr559 import BreakoutLTR559
 from prometheus_remote_write_payload import PrometheusRemoteWritePayload
 
 PROMETHEUS_AUTH = (secrets.PROMETHEUS_USER, secrets.PROMETHEUS_PASSWORD)
 
-# Change this to adjust temperature compensation.
-TEMPERATURE_OFFSET = 3
+# Set up the display.
+display = PicoGraphics(display=DISPLAY_ENVIRO_PLUS)
+display.set_backlight(1.0)
 
 # Connect to the network.
 wlan = network.WLAN(network.STA_IF)
@@ -20,6 +22,7 @@ wlan.active(True)
 wlan.connect(secrets.WIFI_SSID, secrets.WIFI_PASSWORD)
 
 while not wlan.isconnected() and wlan.status() >= 0:
+    # TODO Update the screen.
     print("Connecting to wifi...")
     time.sleep(1)
 
@@ -39,6 +42,8 @@ ltr = BreakoutLTR559(i2c)
 # Set up analog channel for microphone.
 mic = ADC(Pin(26))
 
+# TODO Update the screen.
+
 while True:
     print("Reading sensors...")
 
@@ -48,7 +53,7 @@ while True:
     heater = "Stable" if status & STATUS_HEATER_STABLE else "Unstable"
 
     # Correct temperature and humidity using an offset.
-    corrected_temperature = temperature - TEMPERATURE_OFFSET
+    corrected_temperature = temperature - 3
     dewpoint = temperature - ((100 - humidity) / 5)
     corrected_humidity = 100 - (5 * (corrected_temperature - dewpoint))
 
@@ -67,6 +72,12 @@ while True:
         print(f"Gas: {gas}")
         print(f"Light: {lux}")
         print(f"Sound: {mic_reading}")
+
+        # TODO Update the screen.
+
+        # TODO Send to Prometheus remote write endpoint.
+    else:
+        print("Sensors not ready yet or not reporting.")
 
     print("Sleeping...")
     time.sleep(int(secrets.SAMPLE_INTERVAL))
