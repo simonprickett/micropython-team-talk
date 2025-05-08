@@ -3,9 +3,16 @@ import ntptime
 import secrets
 import time
 
+from breakout_bme68x import BreakoutBME68X, STATUS_HEATER_STABLE
+from machine import Pin, ADC
+from pimoroni_i2c import PimoroniI2C
+from breakout_ltr559 import BreakoutLTR559
 from prometheus_remote_write_payload import PrometheusRemoteWritePayload
 
 PROMETHEUS_AUTH = (secrets.PROMETHEUS_USER, secrets.PROMETHEUS_PASSWORD)
+
+# Change this to adjust temperature compensation.
+TEMPERATURE_OFFSET = 3
 
 # Connect to the network.
 wlan = network.WLAN(network.STA_IF)
@@ -21,5 +28,45 @@ ntptime.settime()
 
 print(f"Connected, IP address: {ip_address}, time: {time.time()}")
 
+# Set up the Pico W's I2C.
+PINS_BREAKOUT_GARDEN = {"sda": 4, "scl": 5}
+i2c = PimoroniI2C(**PINS_BREAKOUT_GARDEN)
+
+# Set up BME688 and LTR559 sensors.
+bme = BreakoutBME68X(i2c, address=0x77)
+ltr = BreakoutLTR559(i2c)
+
+# Set up analog channel for microphone.
+mic = ADC(Pin(26))
+
 while True:
-    time.sleep(0.25)
+    print("Reading sensors...")
+
+    # Read BME688.
+    temperature, pressure, humidity, gas, status, _, _ = bme.read()
+    pressure = pressure / 100
+    heater = "Stable" if status & STATUS_HEATER_STABLE else "Unstable"
+
+    # Correct temperature and humidity using an offset.
+    corrected_temperature = temperature - TEMPERATURE_OFFSET
+    dewpoint = temperature - ((100 - humidity) / 5)
+    corrected_humidity = 100 - (5 * (corrected_temperature - dewpoint))
+
+    # Read LTR559.
+    ltr_reading = ltr.get_reading()
+    lux = ltr_reading[BreakoutLTR559.LUX]
+    prox = ltr_reading[BreakoutLTR559.PROXIMITY]
+
+    # Read mic.
+    mic_reading = mic.read_u16()
+
+    if heater == "Stable" and ltr_reading is not None:
+        print(f"Temperature: {corrected_temperature}")
+        print(f"Humidity: {corrected_humidity}")
+        print(f"Pressure: {pressure}")
+        print(f"Gas: {gas}")
+        print(f"Light: {lux}")
+        print(f"Sound: {mic_reading}")
+
+    print("Sleeping...")
+    time.sleep(int(secrets.SAMPLE_INTERVAL))
