@@ -1,5 +1,7 @@
+import gc
 import network
 import ntptime
+import requests
 import secrets
 import time
 
@@ -10,6 +12,14 @@ from pimoroni_i2c import PimoroniI2C
 from breakout_ltr559 import BreakoutLTR559
 from prometheus_remote_write_payload import PrometheusRemoteWritePayload
 
+
+# Constants for posting data to the Prometheus remote write endpoint.
+PROMETHEUS_REQUEST_HEADERS = {
+    "Content-Encoding": "snappy",
+    "Content-Type": "application/x-protobuf",
+    "User-Agent": "MicroPython-Pimoroni-EnviroPlus",
+    "X-Prometheus-Remote-Write-Version": "1.0.0"
+}
 PROMETHEUS_AUTH = (secrets.PROMETHEUS_USER, secrets.PROMETHEUS_PASSWORD)
 
 def clear_screen():
@@ -73,18 +83,18 @@ while True:
 
     # Read BME688.
     temperature, pressure, humidity, gas, status, _, _ = bme.read()
-    pressure = pressure / 100
+    pressure = round(pressure / 100, 2)
+    gas = round(gas, 2)
     heater = "Stable" if status & STATUS_HEATER_STABLE else "Unstable"
 
     # Correct temperature and humidity using an offset.
-    corrected_temperature = temperature - 3
+    corrected_temperature = round(temperature - 3, 1)
     dewpoint = temperature - ((100 - humidity) / 5)
-    corrected_humidity = 100 - (5 * (corrected_temperature - dewpoint))
+    corrected_humidity = round(100 - (5 * (corrected_temperature - dewpoint)), 1)
 
     # Read LTR559.
     ltr_reading = ltr.get_reading()
-    lux = ltr_reading[BreakoutLTR559.LUX]
-    prox = ltr_reading[BreakoutLTR559.PROXIMITY]
+    lux = round(ltr_reading[BreakoutLTR559.LUX], 2)
 
     # Read mic.
     mic_reading = mic.read_u16()
@@ -97,7 +107,6 @@ while True:
         print(f"Light: {lux}")
         print(f"Sound: {mic_reading}")
 
-        # TODO Update the screen.
         clear_screen()
         display.set_pen(WHITE_PEN)
         display.text(f"Temp: {corrected_temperature}C", 10, 10, WIDTH, scale=2)
@@ -105,10 +114,54 @@ while True:
         display.text(f"Pressure: {pressure}", 10, 50, WIDTH, scale=2)
         display.text(f"Gas: {gas}", 10, 70, WIDTH, scale=2)
         display.text(f"Light: {lux}", 10, 90, WIDTH, scale=2)
-        display.text(f"Sound: {gas}", 10, 110, WIDTH, scale=2)
+        display.text(f"Sound: {mic_reading}", 10, 110, WIDTH, scale=2)
         display.update()
 
-        # TODO Send to Prometheus remote write endpoint.
+        # Send data to Prometheus remote write endpoint.
+        data_timestamp = time.time() * 1000
+
+        prometheus = PrometheusRemoteWritePayload()
+        prometheus.add_data(
+            "temperature", { "instance": secrets.LOCATION }, corrected_temperature, data_timestamp
+        )
+        prometheus.add_data(
+            "humidity", { "instance": secrets.LOCATION }, humidity, data_timestamp
+        )
+        prometheus.add_data(
+            "pressure", { "instance": secrets.LOCATION }, pressure, data_timestamp
+        )
+        prometheus.add_data(
+            "gas", { "instance": secrets.LOCATION }, gas, data_timestamp
+        )
+        prometheus.add_data(
+            "light", { "instance": secrets.LOCATION }, lux, data_timestamp
+        )
+        prometheus.add_data(
+            "sound", { "instance": secrets.LOCATION }, mic_reading, data_timestamp
+        )
+        prometheus.add_data(
+            "memory", { "instance": secrets.LOCATION }, gc.mem_free(), data_timestamp
+        )
+
+        # Send data to the Prometheus remote write endpoint.
+        response = requests.post(
+            secrets.PROMETHEUS_ENDPOINT,
+            headers = PROMETHEUS_REQUEST_HEADERS,
+            auth = PROMETHEUS_AUTH,
+            data = prometheus.get_payload()
+        )
+
+        if response.status_code == 200:
+            print(f"Data sent to remote write endpoint.")
+            display.set_pen(GREEN_PEN)
+            display.text("Data sent!", 10, 135, scale=3)
+        else:
+            print(f"Error {response.status_code} sending data to remote write endpoint.")
+            display.set_pen(RED_PEN)
+            display.text(f"Error: {response.status_code}", 10, 135, scale=3)
+
+        display.update()
+
     else:
         print("Sensors not ready yet or not reporting.")
         clear_screen()
