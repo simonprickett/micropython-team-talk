@@ -12,9 +12,23 @@ from prometheus_remote_write_payload import PrometheusRemoteWritePayload
 
 PROMETHEUS_AUTH = (secrets.PROMETHEUS_USER, secrets.PROMETHEUS_PASSWORD)
 
+def clear_screen():
+    display.set_pen(BLACK_PEN)
+    display.clear()
+
+
 # Set up the display.
 display = PicoGraphics(display=DISPLAY_ENVIRO_PLUS)
 display.set_backlight(1.0)
+display.set_font("bitmap8")
+
+# Some pens we'll use for drawing.
+WHITE_PEN = display.create_pen(255, 255, 255)
+BLACK_PEN = display.create_pen(0, 0, 0)
+RED_PEN = display.create_pen(255, 0, 0)
+GREEN_PEN = display.create_pen(0, 255, 0)
+
+WIDTH, HEIGHT = display.get_bounds()
 
 # Connect to the network.
 wlan = network.WLAN(network.STA_IF)
@@ -24,12 +38,24 @@ wlan.connect(secrets.WIFI_SSID, secrets.WIFI_PASSWORD)
 while not wlan.isconnected() and wlan.status() >= 0:
     # TODO Update the screen.
     print("Connecting to wifi...")
+    clear_screen()
+    display.set_pen(WHITE_PEN)
+    display.text("Connecting to wifi...", 10, 10, WIDTH, scale=3)
+    display.update()
     time.sleep(1)
 
 ip_address = wlan.ifconfig()[0]
 ntptime.settime()
 
 print(f"Connected, IP address: {ip_address}, time: {time.time()}")
+clear_screen()
+display.set_pen(GREEN_PEN)
+display.text("Wifi connected!", 10, 10, WIDTH, scale=3)
+display.text(f"IP: {ip_address}", 10, 50, WIDTH, scale=3)
+display.text(f"Time: {time.time()}", 10, 90, WIDTH, scale=3)
+display.update()
+time.sleep(3)
+clear_screen()
 
 # Set up the Pico W's I2C.
 PINS_BREAKOUT_GARDEN = {"sda": 4, "scl": 5}
@@ -41,8 +67,6 @@ ltr = BreakoutLTR559(i2c)
 
 # Set up analog channel for microphone.
 mic = ADC(Pin(26))
-
-# TODO Update the screen.
 
 while True:
     print("Reading sensors...")
@@ -74,10 +98,26 @@ while True:
         print(f"Sound: {mic_reading}")
 
         # TODO Update the screen.
+        clear_screen()
+        display.set_pen(WHITE_PEN)
+        display.text(f"Temp: {corrected_temperature}C", 10, 10, WIDTH, scale=2)
+        display.text(f"Humidity: {corrected_humidity}%", 10, 30, WIDTH, scale=2)
+        display.text(f"Pressure: {pressure}", 10, 50, WIDTH, scale=2)
+        display.text(f"Gas: {gas}", 10, 70, WIDTH, scale=2)
+        display.text(f"Light: {lux}", 10, 90, WIDTH, scale=2)
+        display.text(f"Sound: {gas}", 10, 110, WIDTH, scale=2)
+        display.update()
 
         # TODO Send to Prometheus remote write endpoint.
     else:
         print("Sensors not ready yet or not reporting.")
+        clear_screen()
+        display.set_pen(RED_PEN)
+        display.text("Sensors not ready.", 10, 80, WIDTH, scale=3)
+        display.update()
 
     print("Sleeping...")
+    display.set_pen(WHITE_PEN)
+    display.text("Sleeping.", 10, 190, scale=3)
+    display.update()
     time.sleep(int(secrets.SAMPLE_INTERVAL))
