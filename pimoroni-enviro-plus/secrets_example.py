@@ -1,0 +1,5 @@
+WIFI_SSID = "Your wifi SSID"
+WIFI_PASSWORD = "Your wifi password"
+PROMETHEUS_ENDPOINT = "https://hostname/api/prom/push"
+PROMETHEUS_USER = "Your username"
+PROMETHEUS_PASSWORD = "Your password" 
