@@ -29,7 +29,7 @@ def clear_screen():
 
 # Set up the display.
 display = PicoGraphics(display=DISPLAY_ENVIRO_PLUS)
-display.set_backlight(1.0)
+display.set_backlight(0.6)
 display.set_font("bitmap8")
 
 # Some pens we'll use for drawing.
@@ -87,8 +87,8 @@ while True:
     gas = round(gas, 2)
     heater = "Stable" if status & STATUS_HEATER_STABLE else "Unstable"
 
-    # Correct temperature and humidity using an offset.
-    corrected_temperature = round(temperature - 3, 1)
+    # Correct temperature and humidity using an offset due to heat from device and screen.
+    corrected_temperature = round(temperature - 5, 1)
     dewpoint = temperature - ((100 - humidity) / 5)
     corrected_humidity = round(100 - (5 * (corrected_temperature - dewpoint)), 1)
 
