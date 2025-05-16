@@ -78,99 +78,107 @@ ltr = BreakoutLTR559(i2c)
 # Set up analog channel for microphone.
 mic = ADC(Pin(26))
 
+metrics_last_sent = 0
+
 while True:
-    print("Reading sensors...")
+    ticks_now = time.ticks_ms()
 
-    # Read BME688.
-    temperature, pressure, humidity, gas, status, _, _ = bme.read()
-    pressure = round(pressure / 100, 2)
-    gas = round(gas, 2)
-    heater = "Stable" if status & STATUS_HEATER_STABLE else "Unstable"
+    # Is it time to send the metrics?
+    if time.ticks_diff(ticks_now, metrics_last_sent) > (int(secrets.SAMPLE_INTERVAL) * 1000):
+        print("Reading sensors...")
 
-    # Correct temperature and humidity using an offset due to heat from device and screen.
-    corrected_temperature = round(temperature - 5, 1)
-    dewpoint = temperature - ((100 - humidity) / 5)
-    corrected_humidity = round(100 - (5 * (corrected_temperature - dewpoint)), 1)
+        # Read BME688.
+        temperature, pressure, humidity, gas, status, _, _ = bme.read()
+        pressure = round(pressure / 100, 2)
+        gas = round(gas, 2)
+        heater = "Stable" if status & STATUS_HEATER_STABLE else "Unstable"
 
-    # Read LTR559.
-    ltr_reading = ltr.get_reading()
-    lux = round(ltr_reading[BreakoutLTR559.LUX], 2)
+        # Correct temperature and humidity using an offset due to heat from device and screen.
+        corrected_temperature = round(temperature - 5, 1)
+        dewpoint = temperature - ((100 - humidity) / 5)
+        corrected_humidity = round(100 - (5 * (corrected_temperature - dewpoint)), 1)
 
-    # Read mic.
-    mic_reading = mic.read_u16()
+        # Read LTR559.
+        ltr_reading = ltr.get_reading()
+        lux = round(ltr_reading[BreakoutLTR559.LUX], 2)
 
-    if heater == "Stable" and ltr_reading is not None:
-        print(f"Temperature: {corrected_temperature}")
-        print(f"Humidity: {corrected_humidity}")
-        print(f"Pressure: {pressure}")
-        print(f"Gas: {gas}")
-        print(f"Light: {lux}")
-        print(f"Sound: {mic_reading}")
+        # Read mic. TODO move this to be an avwerage reading for greater accuracy.
+        mic_reading = mic.read_u16()
 
-        clear_screen()
-        display.set_pen(WHITE_PEN)
-        display.text(f"Temp: {corrected_temperature}C", 10, 10, WIDTH, scale=2)
-        display.text(f"Humidity: {corrected_humidity}%", 10, 30, WIDTH, scale=2)
-        display.text(f"Pressure: {pressure}", 10, 50, WIDTH, scale=2)
-        display.text(f"Gas: {gas}", 10, 70, WIDTH, scale=2)
-        display.text(f"Light: {lux}", 10, 90, WIDTH, scale=2)
-        display.text(f"Sound: {mic_reading}", 10, 110, WIDTH, scale=2)
-        display.update()
+        if heater == "Stable" and ltr_reading is not None:
+            print(f"Temperature: {corrected_temperature}")
+            print(f"Humidity: {corrected_humidity}")
+            print(f"Pressure: {pressure}")
+            print(f"Gas: {gas}")
+            print(f"Light: {lux}")
+            print(f"Sound: {mic_reading}")
 
-        # Send data to Prometheus remote write endpoint.
-        data_timestamp = time.time() * 1000
+            clear_screen()
+            display.set_pen(WHITE_PEN)
+            display.text(f"Temp: {corrected_temperature}C", 10, 10, WIDTH, scale=2)
+            display.text(f"Humidity: {corrected_humidity}%", 10, 30, WIDTH, scale=2)
+            display.text(f"Pressure: {pressure}", 10, 50, WIDTH, scale=2)
+            display.text(f"Gas: {gas}", 10, 70, WIDTH, scale=2)
+            display.text(f"Light: {lux}", 10, 90, WIDTH, scale=2)
+            display.text(f"Sound: {mic_reading}", 10, 110, WIDTH, scale=2)
+            display.update()
 
-        prometheus = PrometheusRemoteWritePayload()
-        prometheus.add_data(
-            "temperature", { "instance": secrets.LOCATION }, corrected_temperature, data_timestamp
-        )
-        prometheus.add_data(
-            "humidity", { "instance": secrets.LOCATION }, humidity, data_timestamp
-        )
-        prometheus.add_data(
-            "pressure", { "instance": secrets.LOCATION }, pressure, data_timestamp
-        )
-        prometheus.add_data(
-            "gas", { "instance": secrets.LOCATION }, gas, data_timestamp
-        )
-        prometheus.add_data(
-            "light", { "instance": secrets.LOCATION }, lux, data_timestamp
-        )
-        prometheus.add_data(
-            "sound", { "instance": secrets.LOCATION }, mic_reading, data_timestamp
-        )
-        prometheus.add_data(
-            "memory", { "instance": secrets.LOCATION }, gc.mem_free(), data_timestamp
-        )
+            # Send data to Prometheus remote write endpoint.
+            data_timestamp = time.time() * 1000
 
-        # Send data to the Prometheus remote write endpoint.
-        response = requests.post(
-            secrets.PROMETHEUS_ENDPOINT,
-            headers = PROMETHEUS_REQUEST_HEADERS,
-            auth = PROMETHEUS_AUTH,
-            data = prometheus.get_payload()
-        )
+            prometheus = PrometheusRemoteWritePayload()
+            prometheus.add_data(
+                "temperature", { "instance": secrets.LOCATION }, corrected_temperature, data_timestamp
+            )
+            prometheus.add_data(
+                "humidity", { "instance": secrets.LOCATION }, humidity, data_timestamp
+            )
+            prometheus.add_data(
+                "pressure", { "instance": secrets.LOCATION }, pressure, data_timestamp
+            )
+            prometheus.add_data(
+                "gas", { "instance": secrets.LOCATION }, gas, data_timestamp
+            )
+            prometheus.add_data(
+                "light", { "instance": secrets.LOCATION }, lux, data_timestamp
+            )
+            prometheus.add_data(
+                "sound", { "instance": secrets.LOCATION }, mic_reading, data_timestamp
+            )
+            prometheus.add_data(
+                "memory", { "instance": secrets.LOCATION }, gc.mem_free(), data_timestamp
+            )
 
-        if response.status_code == 200:
-            print(f"Data sent to remote write endpoint.")
-            display.set_pen(GREEN_PEN)
-            display.text("Data sent!", 10, 135, scale=3)
+            # Send data to the Prometheus remote write endpoint.
+            # response = requests.post(
+            #     secrets.PROMETHEUS_ENDPOINT,
+            #     headers = PROMETHEUS_REQUEST_HEADERS,
+            #     auth = PROMETHEUS_AUTH,
+            #     data = prometheus.get_payload()
+            # )
+
+            # if response.status_code == 200:
+            #     print(f"Data sent to remote write endpoint.")
+            #     display.set_pen(GREEN_PEN)
+            #     display.text("Data sent!", 10, 135, scale=3)
+            # else:
+            #     print(f"Error {response.status_code} sending data to remote write endpoint.")
+            #     display.set_pen(RED_PEN)
+            #     display.text(f"Error: {response.status_code}", 10, 135, scale=3)
+
+            display.update()
+
+            metrics_last_sent = time.ticks_ms()
+
         else:
-            print(f"Error {response.status_code} sending data to remote write endpoint.")
+            print("Sensors not ready yet or not reporting.")
+            clear_screen()
             display.set_pen(RED_PEN)
-            display.text(f"Error: {response.status_code}", 10, 135, scale=3)
-
-        display.update()
-
-    else:
-        print("Sensors not ready yet or not reporting.")
-        clear_screen()
-        display.set_pen(RED_PEN)
-        display.text("Sensors not ready.", 10, 80, WIDTH, scale=3)
-        display.update()
+            display.text("Sensors not ready.", 10, 80, WIDTH, scale=3)
+            display.update()
 
     print("Sleeping...")
     display.set_pen(WHITE_PEN)
     display.text("Sleeping.", 10, 190, scale=3)
     display.update()
-    time.sleep(int(secrets.SAMPLE_INTERVAL))
+    time.sleep(1)
