@@ -79,8 +79,15 @@ ltr = BreakoutLTR559(i2c)
 mic = ADC(Pin(26))
 
 metrics_last_sent = 0
+num_mic_readings = 0
+total_mic_values = 0
 
 while True:
+    print(f"Next mic reading {mic.read_u16()}") 
+    total_mic_values += mic.read_u16()
+    num_mic_readings += 1
+    print(f"Mic readings taken: {num_mic_readings}, avg {round(total_mic_values / num_mic_readings)}")
+
     ticks_now = time.ticks_ms()
 
     # Is it time to send the metrics?
@@ -177,8 +184,12 @@ while True:
             display.text("Sensors not ready.", 10, 80, WIDTH, scale=3)
             display.update()
 
+        # Reset the microphone averaging process.
+        num_mic_readings = 0
+        total_mic_values = 0
+
     print("Sleeping...")
     display.set_pen(WHITE_PEN)
     display.text("Sleeping.", 10, 190, scale=3)
     display.update()
-    time.sleep(1)
+    time.sleep(.25)
