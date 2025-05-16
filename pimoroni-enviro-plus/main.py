@@ -109,8 +109,8 @@ while True:
         ltr_reading = ltr.get_reading()
         lux = round(ltr_reading[BreakoutLTR559.LUX], 2)
 
-        # Read mic. TODO move this to be an avwerage reading for greater accuracy.
-        mic_reading = mic.read_u16()
+        # Calculate an average mic reading over the period.
+        mic_reading = round(total_mic_values / num_mic_readings)
 
         if heater == "Stable" and ltr_reading is not None:
             print(f"Temperature: {corrected_temperature}")
