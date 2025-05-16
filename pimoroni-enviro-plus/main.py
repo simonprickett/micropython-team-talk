@@ -157,21 +157,21 @@ while True:
             )
 
             # Send data to the Prometheus remote write endpoint.
-            # response = requests.post(
-            #     secrets.PROMETHEUS_ENDPOINT,
-            #     headers = PROMETHEUS_REQUEST_HEADERS,
-            #     auth = PROMETHEUS_AUTH,
-            #     data = prometheus.get_payload()
-            # )
+            response = requests.post(
+                secrets.PROMETHEUS_ENDPOINT,
+                headers = PROMETHEUS_REQUEST_HEADERS,
+                auth = PROMETHEUS_AUTH,
+                data = prometheus.get_payload()
+            )
 
-            # if response.status_code == 200:
-            #     print(f"Data sent to remote write endpoint.")
-            #     display.set_pen(GREEN_PEN)
-            #     display.text("Data sent!", 10, 135, scale=3)
-            # else:
-            #     print(f"Error {response.status_code} sending data to remote write endpoint.")
-            #     display.set_pen(RED_PEN)
-            #     display.text(f"Error: {response.status_code}", 10, 135, scale=3)
+            if response.status_code == 200:
+                print(f"Data sent to remote write endpoint.")
+                display.set_pen(GREEN_PEN)
+                display.text("Data sent!", 10, 135, scale=3)
+            else:
+                print(f"Error {response.status_code} sending data to remote write endpoint.")
+                display.set_pen(RED_PEN)
+                display.text(f"Error: {response.status_code}", 10, 135, scale=3)
 
             display.update()
 
