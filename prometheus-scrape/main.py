@@ -8,28 +8,38 @@ from microdot import Microdot
 
 rolls = [0, 0, 0, 0, 0, 0]
 
+html_action_list = f"""
+    <p>You can:</p>
+    <ul>
+        <li><a href="/roll">Roll the dice</a>.</li>
+        <li><a href="/metrics">View the metrics</a>.</li>
+        <li><a href="/reset">Reset the counters</a>.</li>
+    </ul>
+"""
+
 app = Microdot()
+
+# TODO work on this some more...
+def generate_html_page(html_body):
+    return f"""<!DOCTYPE html><html><head><meta charset="UTF-8"><title>MicroPython Dice Roll Example</title></head><body>{html_body}</body></html>"""
 
 @app.route("/")
 async def index(request):
-    # TODO replace this with a list of links.
-    return "Application is running!"
+    return generate_html_page(f"""<h1>MicroPython Dice Roll Example</h1>{html_action_list}"""), {"Content-Type": "text/html"}
 
 
 @app.route("/roll")
 async def rolldice(request):
     this_roll = random.randint(1, 6)
     rolls[this_roll - 1] = rolls[this_roll - 1] + 1
-    # TODO add roll again, see metrics, reset links.
-    return f"You rolled a {this_roll}."
+    return generate_html_page(f"<p>You rolled a {this_roll}.</p>{html_action_list}"), {"Content-Type": "text/html"}
 
 
 @app.route("/reset")
 async def reset(request):
     global rolls
     rolls = [0, 0, 0, 0, 0 , 0]
-    # TODO add a home link.
-    return "Roll counts reset to 0."
+    return generate_html_page(f"<p>Roll counts reset to 0.</p>{html_action_list}"), {"Content-Type": "text/html"}
 
 
 @app.route("/metrics")
