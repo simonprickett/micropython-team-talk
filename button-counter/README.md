@@ -1,6 +1,10 @@
 # Button Counter Example
 
-TODO
+![A Pico W with two arcade buttons attached](pico_arcade_buttons.jpg)
+
+![Example Grafana dashboard showing button pressed](example_button_press_dashboard.png)
+
+TODO introduction.
 
 ## Hardware
 
@@ -113,4 +117,40 @@ Connecting to wifi...
 Connected, IP address: 192.168.4.45, time: 1748349089
 ```
 
-TODO remainder of the README!
+## Mash those Buttons!
+
+Now for the fun part!  Press the button that adds one to the counter metric (on my setup this is the green button).  Do this several times over a period of time.  You'll see the button presses being captured and data sent to the Prometheus remote write endpoint at the MicroPython console:
+
+```
+Connected, IP address: 192.168.4.45, time: 1748349869
+Pressed!
+Sending data...
+Data sent: num_presses 1.
+Pressed!
+Sending data...
+Data sent: num_presses 2.
+Pressed!
+Sending data...
+Data sent: num_presses 3.
+Pressed!
+Sending data...
+Data sent: num_presses 4.
+Pressed!
+Sending data...
+Data sent: num_presses 5.
+Pressed!
+Sending data...
+Data sent: num_presses 6.
+```
+
+If at any point you want to reset the counter, press the reset button (on my setup this is the red button):
+
+```
+Count reset to 0.
+```
+
+This resets the count to 0 locally, so the next button press on the count (green) button will send a new count of 1.
+
+## Visualizing the Metrics with Grafana Cloud
+
+TODO
