@@ -24,6 +24,8 @@ You'll need to install a MicroPython runtime on the Pico W.  Get the latest `.uf
 * [Image for Raspberry Pi Pico W](https://micropython.org/download/RPI_PICO_W/)
 * [Image for Raspberry Pi Pico 2 W](https://micropython.org/download/RPI_PICO2_W/)
 
+We've tested the code using MicroPython 1.25.
+
 ## Install Dependencies
 
 TODO `mpremote` install instructions.
