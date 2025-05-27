@@ -1,6 +1,34 @@
-# TODO
+# MicroPython Examples with Grafana and Prometheus
 
 TODO introduction...
+
+## Get the Code and Setup Your Machine
+
+Before trying the examples, you'll need to complete a few common setup steps...
+
+### Get the Code
+
+At the terminal, clone this repository to your local machine:
+
+```bash
+git clone https://github.com/simonprickett/micropython-team-talk.git
+```
+
+### Install mpremote
+
+We'll use MicroPython's `mpremote` command to copy files to the Pico W and run them.  Install `mpremote` on your local machine by following [these instructions](https://docs.micropython.org/en/latest/reference/mpremote.html).
+
+Verify that `mpremote` has been installed by checking its version:
+
+```bash
+mpremote --version
+```
+
+You should see output similar to this:
+
+```
+mpremote 1.25.0
+```
 
 ## Demos
 
