@@ -10,10 +10,10 @@ TODO introduction.
 
 To try this out you'll need the following hardware:
 
-* 1 Raspberry Pi [Pico W](https://shop.pimoroni.com/products/raspberry-pi-pico-w?variant=40059369652307) or [Pico 2 W](https://shop.pimoroni.com/products/raspberry-pi-pico-2-w?variant=54852253024635) - get one with headers already attached, so that you don't have to buy these separately and solder them on yourself. These are also known as the "WH" versions.
-* 1 [USB to Micro USB data cable](https://shop.pimoroni.com/products/usb-a-to-microb-cable-black?variant=31241639562), used to power the Pico W and install software on it.
-* TODO arcade buttons
-* TODO jumper wires
+* 1 Raspberry Pi [Pico W](https://thepihut.com/products/raspberry-pi-pico-w?variant=41952994787523) or [Pico 2 W](https://thepihut.com/products/raspberry-pi-pico-2-w?variant=54063378760065) - get one with headers already attached, so that you don't have to buy these separately and solder them on yourself. These are also known as the "WH" versions.
+* 1 [USB to Micro USB data cable](https://thepihut.com/products/usb-to-micro-usb-cable-0-5m?variant=37979679293635), used to power the Pico W and install software on it.
+* 2 [arcade buttons](https://thepihut.com/products/arcade-button-30mm-translucent-red) (I'm using a red and a green one but you can use any!).  
+* 1 pack of [spade connector to female jumper wires](https://thepihut.com/products/4-8mm-spade-to-female-jumper-wires-10-pack). These are used to connect the buttons to the GPIO pins on the Pico W. You'll need 4 wires, they come in packs of 10.
 
 ## Assembling the Hardware
 
