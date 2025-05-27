@@ -37,4 +37,4 @@ This repository contains a number of MicroPython demos. Each is standalone and c
 1. [Hello World](./hello-world/) - a simple blinking LED.
 1. [Counting with Arcade Buttons](./button-counter/) - sending button count metrics to a Prometheus remote write endpoint.
 1. [Scraping Metrics with Prometheus](./prometheus-scrape/) - exposing metrics via HTTP so that Prometheus can scrape them.
-1. [Environment Monitoring with the Pimoroni Enviro+](./pimoroni-enviro-plus/) - monitoring the environment in a room with a variety of sensors connected to the Pimoroni Enviro+ add-on pack.
+1. [Environment Monitoring with the Pimoroni Enviro+ and Grafana Cloud](./pimoroni-enviro-plus/) - monitoring the environment in a room with a variety of sensors connected to the Pimoroni Enviro+ add-on pack.
