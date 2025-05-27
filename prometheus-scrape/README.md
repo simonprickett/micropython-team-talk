@@ -17,9 +17,29 @@ You'll need to install a MicroPython runtime on the Pico W.  Get the latest `.uf
 
 We've tested the code using MicroPython 1.25.
 
-## Copy the Source Code to the Pico W
+## Configure and Install the Code
 
-TODO
+Now its time to copy the source code to your Pico W and configure the WiFi network credentials.
+
+At your terminal, first change to the correct directory:
+
+```bash
+cd prometheus-scrape
+```
+
+### Configuring Secrets
+
+Next, create a `secrets.py` file by copying the example provided:
+
+```bash
+cp secrets_example.py secrets.py
+```
+
+Using a text editor, edit `secrets.py`, replacing the values of `WIFI_SSID` and `WIFI_PASSWORD` with the values for your network. Save your changes.
+
+### Copying Code to the Pico W
+
+TODO further instructions...
 
 ## Run the Code
 
