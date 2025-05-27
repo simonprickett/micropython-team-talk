@@ -75,10 +75,24 @@ Verify that the code was copied correctly:
 mpremote fs ls
 ```
 
+then 
+
+```bash
+mpremote fs ls lib/
+```
+
 You should see output similar to this (your file sizes may vary from those shown):
 
 ```
-TODO AND THE LIB...
+ls :
+           0 lib/
+        2451 main.py
+         362 secrets.py
+```
+
+```
+ls :lib/
+           0 prometheus_remote_write_payload/
 ```
 
 ## Run the Code
@@ -89,10 +103,14 @@ With your Pico W connected to your machine by the USB to MicroUSB cable, run the
 mpremote run main.py
 ```
 
-You should see output similar to the following on the MicroPython console:
+You should see output similar to the following on the MicroPython console as the code starts up and connects to the network:
 
 ```
-TODO
+Connecting to wifi...
+Connecting to wifi...
+Connecting to wifi...
+Connecting to wifi...
+Connected, IP address: 192.168.4.45, time: 1748349089
 ```
 
 TODO remainder of the README!
