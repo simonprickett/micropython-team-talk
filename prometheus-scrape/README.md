@@ -1,10 +1,12 @@
 # Prometheus Metrics Scraping Example
 
-TODO overview...
+This is a simple example showing how to expose metrics in a format that Prometheus can consume by making a HTTP request to a MicroPython script running on the Pico W. It's a sample application that allows you to roll a dice and build up some metrics about how many times each number has been rolled.
+
+This uses a locally installed copy of open source Prometheus.
 
 ## Hardware
 
-You'll need either a [Raspberry Pi Pico W](https://shop.pimoroni.com/products/raspberry-pi-pico-w?variant=40059369652307) or the newer [Pico 2 W](https://shop.pimoroni.com/products/raspberry-pi-pico-2-w?variant=54852253024635).  As we're not connecting any other hardware to the microcontroller, you don't need to byu one with the headers attached. However, if you also want to try the [button counter example project](../button-counter/), you should get the "WH" version with the headers pre-soldered.
+You'll want either a [Raspberry Pi Pico W](https://shop.pimoroni.com/products/raspberry-pi-pico-w?variant=40059369652307) or the newer [Pico 2 W](https://shop.pimoroni.com/products/raspberry-pi-pico-2-w?variant=54852253024635).  As we're not connecting any other hardware to the microcontroller, you don't need to buy one with the headers attached. However, if you also want to try the [button counter example project](../button-counter/), you should get the "WH" version with the headers pre-soldered.
 
 To get the code onto the device and power it, you'll need a [USB to Micro USB data cable](https://shop.pimoroni.com/products/usb-a-to-microb-cable-black?variant=31241639562) too.
 
@@ -39,11 +41,38 @@ Using a text editor, edit `secrets.py`, replacing the values of `WIFI_SSID` and 
 
 ### Copying Code to the Pico W
 
-TODO further instructions...
+We'll copy the source code to the Pico W using the `mpremote` command.  Connect your Pico W to your machine using the USB to Micro USB cable, then enter the following commands:
+
+```bash
+mpremote fs cp main.py :main.py
+mpremote fs cp secrets.py :secrets.py
+mpremote fs cp microdot.py :microdot.py
+```
+
+This project uses parts of the [Microdot framework](https://microdot.readthedocs.io/en/latest/index.html) (MIT license) to implement a simple web server. For convenience, the file `microdot.py` from this project has been included in this repository.
+
+Verify that the code was copied correctly:
+
+```bash
+mpremote fs ls
+```
+
+You should see output similar to this (your file sizes may vary from those shown):
+
+```
+ls :
+        1848 main.py
+       56305 microdot.py
+          60 secrets.py
+```
 
 ## Run the Code
 
-TODO
+With your Pico W connected to your machine by the USB to MicroUSB cable, run the code like so:
+
+```bash
+mpremote run main.py
+```
 
 You should see output similar to the following on the MicroPython console:
 
@@ -97,7 +126,7 @@ scrape_configs:
       - targets: ['192.168.5.31:80']
 ```
 
-## Checking that Promethus is Scraping the Pico W
+## Scraping Metrics with Prometheus
 
 With the MicroPython code up and running on your Pico W, go ahead and start Prometheus like so:
 
