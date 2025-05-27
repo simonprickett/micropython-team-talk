@@ -1,5 +1,4 @@
 import network
-import ntptime
 import random
 import secrets
 import time
@@ -19,7 +18,6 @@ html_action_list = f"""
 
 app = Microdot()
 
-# TODO work on this some more...
 def generate_html_page(html_body):
     return f"""<!DOCTYPE html><html><head><meta charset="UTF-8"><title>MicroPython Dice Roll Example</title></head><body>{html_body}</body></html>"""
 
@@ -44,7 +42,6 @@ async def reset(request):
 
 @app.route("/metrics")
 async def metrics(request):
-    # TODO tidy this up into Prometheus format.
     return f"""dice_roll{{number="1"}} {rolls[0]}
 dice_roll{{number="2"}} {rolls[1]}
 dice_roll{{number="3"}} {rolls[2]}
@@ -64,8 +61,6 @@ while not wlan.isconnected() and wlan.status() >= 0:
 
 ip_address = wlan.ifconfig()[0]
 print(f"Visit http://{ip_address}:{secrets.PORT}")
-
-ntptime.settime()
 
 # Start the server.
 app.run(port=secrets.PORT)
