@@ -2,11 +2,11 @@
 
 ![A Grafana dashboard showing output from this project](pimoroni_enviro_plus_dashboard_example.png)
 
-TODO overview...
+This is a basic demonstration MicroPython script that gathers data from the different types of sensor built into the Pimoroni Enviro+ Pack and sends it to a Prometheus remote write endpoint. We're using Grafana Cloud for data storage and visualization but other solutions should work too.
 
 ## Grafana Cloud Setup
 
-TODO
+TODO - consider moving this to the main README as a common pre-requisite.
 
 ## Hardware
 
@@ -18,7 +18,9 @@ This demo requires some specific hardware items to run on. These are:
 
 ## Assembling the Hardware
 
-TODO
+Align the Pico W's header pins with the female headers on the back of the Pico Enviro+ Pack. Ensure that the micro USB port on the Pico W is at the right end of the Pico Enviro+ Pack - you'll find an outline of a micro USB port and a "USB" label printed there. Once you have the two components aligned, apply a firm but even pressure to press the Pico W's headers fully into the Pico Enviro+ Pack. That's all there is to it, you're ready to go!
+
+TODO add a picture.
 
 ## MicroPython Version
 
