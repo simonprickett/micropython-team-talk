@@ -4,7 +4,7 @@
 
 ![Example Grafana dashboard showing button pressed](example_button_press_dashboard.png)
 
-TODO introduction.
+This is an example MicroPython script that uses two arcade or similar style buttons to send counter metrics to a Prometheus remote write endpoint, such as the one provided with Grafana Cloud.
 
 ## Hardware
 
