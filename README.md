@@ -1,6 +1,6 @@
 # MicroPython Examples with Grafana and Prometheus
 
-TODO introduction...
+This repository contains some example MicroPython scripts that explore different ways to get metrics from devices to Prometheus / Grafana Cloud. The code runs on Raspberry Pi Pico W microcontrollers. One example requires a couple of arcade or similar type buttons, another is specific to the Pimoroni Enviro+ Pack.
 
 ## Get the Code and Setup Your Machine
 
