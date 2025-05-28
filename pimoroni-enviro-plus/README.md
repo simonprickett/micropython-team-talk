@@ -20,7 +20,7 @@ This demo requires some specific hardware items to run on. These are:
 
 Align the Pico W's header pins with the female headers on the back of the Pico Enviro+ Pack. Ensure that the micro USB port on the Pico W is at the right end of the Pico Enviro+ Pack - you'll find an outline of a micro USB port and a "USB" label printed there. Once you have the two components aligned, apply a firm but even pressure to press the Pico W's headers fully into the Pico Enviro+ Pack. That's all there is to it, you're ready to go!
 
-TODO add a picture.
+![Connecting the Enviro+ to the Pico W](connecting_the_enviro_plus.jpg)
 
 ## MicroPython Version
 
