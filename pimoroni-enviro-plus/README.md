@@ -2,6 +2,8 @@
 
 ![A Grafana dashboard showing output from this project](pimoroni_enviro_plus_dashboard_example.png)
 
+[Check out the live dashboard here](https://simonprickett.grafana.net/public-dashboards/de7fbc0983314bf88143e4d748d1d359)!
+
 This is a basic demonstration MicroPython script that gathers data from the different types of sensor built into the Pimoroni Enviro+ Pack and sends it to a Prometheus remote write endpoint. We're using Grafana Cloud for data storage and visualization but other solutions should work too.
 
 ## Grafana Cloud Setup
