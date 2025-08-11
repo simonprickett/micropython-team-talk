@@ -38,7 +38,18 @@ TODO
 mpremote mip install github:ttk1/prometheus_remote_write_payload
 ```
 
-TODO how to verify the installation.
+Verify that the code was installed by runnning this command:
+
+```bash
+mpremote fs ls lib
+```
+
+You should see output similar to the following:
+
+```
+ls :lib
+           0 prometheus_remote_write_payload/
+```
 
 ## Configure and Install the Code
 
