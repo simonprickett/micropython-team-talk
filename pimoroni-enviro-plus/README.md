@@ -15,6 +15,7 @@ TODO - consider moving this to the main README as a common pre-requisite.
 This demo requires some specific hardware items to run on. These are:
 
 * 1 Raspberry Pi [Pico W](https://shop.pimoroni.com/products/raspberry-pi-pico-w?variant=40059369652307) - get one with headers already attached, so that you don't have to buy these separately and solder them on yourself. These are also known as the "WH" versions.  At the time of writing, the required MicroPython build for this project wasn't readily available for the Pico 2 W so avoid those and stick with the original model.
+* Alternatively, you can use a [Raspberry Pi Pico 2W](https://shop.pimoroni.com/products/raspberry-pi-pico-2-w?variant=54852253024635) - again, get one with the headers already attached.  These cost a little more, and are a little more capable (faster, more RAM) but this project will work fine with the original Pico W if you are budget aware.
 * 1 Pimoroni [Pico Enviro+ Pack](https://shop.pimoroni.com/products/pico-enviro-pack?variant=40045073662035) (just get the pack, you don't need any of the extra accessories such as the external particulate sensor).
 * 1 [USB to Micro USB data cable](https://shop.pimoroni.com/products/usb-a-to-microb-cable-black?variant=31241639562). This is for powering the device and installing software on it.
 
@@ -26,7 +27,10 @@ Align the Pico W's header pins with the female headers on the back of the Pico E
 
 ## MicroPython Version
 
-You'll need to install a MicroPython runtime on the Pico W. The Enviro+ Pack uses a specific build of Pimoroni MicroPython which has all of the sensor drivers you need built in.  Download the latest from Pimoroni's GitHub [here](https://github.com/pimoroni/pimoroni-pico/releases). Be sure to get the file named `enviro-<version>-pimoroni-micropython.uf2`.
+You'll need to install a MicroPython runtime on the Pico W. The Enviro+ Pack uses a specific build of Pimoroni MicroPython which has all of the sensor drivers you need built in.  
+
+* If you have a Pico W, download the latest from Pimoroni's GitHub [here](https://github.com/pimoroni/pimoroni-pico/releases). Be sure to get the file named `enviro-<version>-pimoroni-micropython.uf2`.
+* If you are using s Pico 2W, download [this version](https://github.com/pimoroni/pimoroni-pico-rp2350/releases), also from Pimoroni's GitHib.
 
 TODO how to install that.
 
@@ -82,6 +86,11 @@ Save your changes.
 ### Copying Code to the Pico W
 
 TODO further instructions...
+
+```bash
+mpremote fs cp main.py :main.py
+mpremote fs cp secrets.py :secrets.py
+```
 
 ## Run the Code
 
